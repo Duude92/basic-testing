@@ -1,13 +1,29 @@
 // Uncomment the code below and write your tests
-import { getBankAccount, InsufficientFundsError, TransferFailedError } from '.';
+import {
+  getBankAccount,
+  InsufficientFundsError,
+  SynchronizationFailedError,
+  TransferFailedError,
+} from '.';
+import { random } from 'lodash';
 
 const initialMoney = 100500;
 let bankAccount = getBankAccount(initialMoney);
 let anotherAccount = getBankAccount(0);
+jest.mock('lodash', () => {
+  return {
+    random: jest.fn(() => {}),
+  };
+});
+// jest.spyOn(lodash, 'random').mockImplementation(() => 1);
 describe('BankAccount', () => {
   beforeEach(() => {
     bankAccount = getBankAccount(initialMoney);
     anotherAccount = getBankAccount(0);
+  });
+  afterEach(() => {
+    // restore the spy created with spyOn
+    jest.restoreAllMocks();
   });
   test('should create account with initial balance', () => {
     // Write your test here
@@ -54,13 +70,27 @@ describe('BankAccount', () => {
 
   test('fetchBalance should return number in case if request did not failed', async () => {
     // Write your tests here
+    (random as jest.Mock)
+      .mockReturnValueOnce(200)
+      .mockReturnValueOnce(1)
+      .mockReturnValueOnce(100)
+      .mockReturnValueOnce(0);
+    await expect(bankAccount.fetchBalance()).resolves.toBe(200);
+    await expect(bankAccount.fetchBalance()).resolves.toBe(null);
   });
 
   test('should set new balance if fetchBalance returned number', async () => {
     // Write your tests here
+    (random as jest.Mock).mockReturnValueOnce(200).mockReturnValueOnce(1);
+    await bankAccount.synchronizeBalance();
+    expect(bankAccount.getBalance()).toBe(200);
   });
 
   test('should throw SynchronizationFailedError if fetchBalance returned null', async () => {
     // Write your tests here
+    (random as jest.Mock).mockReturnValueOnce(100).mockReturnValueOnce(0);
+    await expect(bankAccount.synchronizeBalance()).rejects.toThrow(
+      SynchronizationFailedError,
+    );
   });
 });
