@@ -5,6 +5,10 @@ const testCases = [
   { a: 1, b: 2, action: Action.Add, expected: 3 },
   { a: 2, b: 2, action: Action.Add, expected: 4 },
   { a: 3, b: 2, action: Action.Add, expected: 5 },
+  { a: 4, b: 2, action: Action.Divide, expected: 2 },
+  { a: 5, b: 2, action: Action.Subtract, expected: 3 },
+  { a: 6, b: 2, action: Action.Multiply, expected: 12 },
+  { a: 3, b: 5, action: Action.Exponentiate, expected: 243 },
   // continue cases for other actions
 ];
 
